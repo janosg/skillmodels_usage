@@ -3,21 +3,28 @@
 
 def build(ctx):
 
-    for model in 'baseline', 'max_moves_2':
+    model_list = ['test_model', 'test_model_without_normalizations']
+    dataset_list = ['chs_test_ex1_v1_ready', 'chs_test_ex1_v1_ready']
 
-        # Illustrate use of run_py_script with automatic model specification.
-        ctx(
-            features='run_py_script',
-            source='schelling.py',
+    for model, dataset in zip(model_list, dataset_list):
+        ctx(features='run_py_script',
+            source='fit_models.py',
             deps=[
-                ctx.path_to(ctx, 'OUT_DATA', 'initial_locations.csv'),
-                ctx.path_to(ctx, 'IN_MODEL_CODE', 'agent.py'),
-                ctx.path_to(ctx, 'IN_MODEL_SPECS', '{}.json'.format(model)),
+                ctx.path_to(ctx, 'OUT_DATA', 'final/{}.dta'.format(dataset)),
+                ctx.path_to(ctx, 'IN_MODEL_SPECS', '{}.json'.format(model))],
+            target=ctx.path_to(
+                ctx, 'OUT_ANALYSIS', '{}_{}/results_df.csv'.format(
+                    model, dataset)),
+            append=[model, dataset]),
+
+        ctx(features='run_py_script',
+            source='visualize_fortran_and_python_parameters.py',
+            deps=[ctx.path_to(ctx, 'OUT_ANALYSIS', '{}_{}/results_df.csv'.format(
+                    model, dataset)),
+                  ctx.path_to(ctx, 'LIBRARY', 'true_{}_results.csv'.format(model))
             ],
-            target=[
-                ctx.path_to(ctx, 'OUT_ANALYSIS', 'schelling_{}.pickle'.format(model)),
-                ctx.path_to(ctx, 'OUT_ANALYSIS', 'log', 'schelling_{}.log'.format(model))
-            ],
-            append=model,
-            name='schelling_{}'.format(model)
-        )
+            target=ctx.path_to(
+                ctx, 'OUT_ANALYSIS', '{}_{}/comparison_plot.png'.format(
+                    model, dataset)),
+            append=[model, dataset])
+

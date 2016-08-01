@@ -11,17 +11,17 @@ out = 'bld'
 
 def set_project_paths(ctx):
     """Return a dictionary with project paths represented by Waf nodes."""
-
     pp = {}
     pp['PROJECT_ROOT'] = '.'
     pp['IN_DATA'] = 'src/original_data'
-    pp['IN_MODEL_CODE'] = 'src/model_code'
     pp['IN_MODEL_SPECS'] = 'src/model_specs'
     pp['OUT_DATA'] = '{}/out/data'.format(out)
     pp['OUT_ANALYSIS'] = '{}/out/analysis'.format(out)
     pp['OUT_FINAL'] = '{}/out/final'.format(out)
     pp['OUT_FIGURES'] = '{}/out/figures'.format(out)
     pp['OUT_TABLES'] = '{}/out/tables'.format(out)
+    pp['LIBRARY'] = 'src/library'
+
 
     # Convert the directories into Waf nodes.
     for key, val in pp.items():
@@ -59,10 +59,10 @@ def path_to(ctx, pp_key, *args):
 def configure(ctx):
     ctx.env.PYTHONPATH = os.getcwd()
     # Disable on a machine where security risks could arise
-    ctx.env.PDFLATEXFLAGS = '-shell-escape'
-    ctx.load('biber')
+    # ctx.env.PDFLATEXFLAGS = '-shell-escape'
+    # ctx.load('biber')
     ctx.load('run_py_script')
-    ctx.load('sphinx_build')
+    # ctx.load('sphinx_build')
     ctx.load('write_project_headers')
 
 
