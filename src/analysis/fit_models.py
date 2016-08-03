@@ -1,4 +1,4 @@
-from skillmodels import CHSModel
+from skillmodels import SkillModel
 from bld.project_paths import project_paths_join as ppj
 import pandas as pd
 from pandas import DataFrame
@@ -8,21 +8,27 @@ import sys
 
 if __name__ == '__main__':
     model_name, dataset_name = sys.argv[1:3]
+
+    # load the model dict from a json file in src.model_specs
     with open(ppj('IN_MODEL_SPECS', '{}.json'.format(model_name))) as j:
         model_dict = json.load(j)
 
+    # load the dataset from a dta file in bld.out.data
     dataset = pd.read_stata(ppj('OUT_DATA', 'final/{}.dta'.format(dataset_name)))
 
-    mod = CHSModel(model_name, dataset_name, model_dict, dataset)
+    # create an instance of SkillModel
+    mod = SkillModel(model_name, dataset_name, model_dict, dataset, 'chs')
+    # call its fit method to estimate the model
     res = mod.fit()
 
+    # create a pandas DataFrame containing the parameters and standard errors
     df = DataFrame(data=res.params, columns=['params'], index=res.param_names)
     df['se'] = res.bse
     df['pvalues'] = res.pvalues
     df['tvalues'] = res.tvalues
-
     df.reset_index(inplace=True)
 
+    # save the DataFrame
     result_path = ppj('OUT_ANALYSIS', '{}_{}/results_df.csv').format(
         model_name, dataset_name)
 

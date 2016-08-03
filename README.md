@@ -1,3 +1,6 @@
+skillmodels usage
+=================
+
 This repository illustrates the use of skillmodels - a python package for the estimation of non-linear skill formation models and other non-linear dynamic latent factor models.
 
 The code is structured according to the Project Templates by Hans-Martin von Gaudecker that can be found [here](https://github.com/hmgaudecker/econ-project-templates). To run the code you need Conda. If you use Anaconda or Miniconda you already have it. Else, see [here](http://conda.pydata.org/docs/install/quick.html) for installation instructions.
