@@ -3,14 +3,14 @@
 
 def build(ctx):
 
-    model_list = ['test_model', 'test_model_without_normalizations']
-    dataset_list = ['chs_test_ex1_v1_ready', 'chs_test_ex1_v1_ready']
+    model_list = ['test_model2']
+    dataset_list = ['chs_test_ex2_ready']
 
     for model, dataset in zip(model_list, dataset_list):
         ctx(features='run_py_script',
             source='fit_models.py',
             deps=[
-                ctx.path_to(ctx, 'OUT_DATA', 'final/{}.dta'.format(dataset)),
+                ctx.path_to(ctx, 'OUT_DATA', '{}.dta'.format(dataset)),
                 ctx.path_to(ctx, 'IN_MODEL_SPECS', '{}.json'.format(model))],
             target=ctx.path_to(
                 ctx, 'OUT_ANALYSIS', '{}_{}/results_df.csv'.format(

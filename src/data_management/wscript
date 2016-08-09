@@ -4,12 +4,12 @@
 def build(ctx):
 
     # CHS Test Data Management
-    for dataset in ['chs_test_ex1_v1', 'chs_test_ex2']:
+    for dataset in ['chs_test_ex2']:
         ctx(
             features='run_py_script',
             source='chs_example_data_management.py',
             deps=ctx.path_to(ctx, 'IN_DATA', '{}.dta'.format(dataset)),
             target=ctx.path_to(
-                ctx, 'OUT_DATA', 'final/{}_ready.dta'.format(dataset)),
+                ctx, 'OUT_DATA', '{}_ready.dta'.format(dataset)),
             append=dataset
         )

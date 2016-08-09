@@ -11,4 +11,4 @@ if __name__ == '__main__':
     data = data.drop(
         ['dy1', 'dy2', 'dy3', 'dy4', 'dy5', 'dy6', 'dQ1'], axis=1)
 
-    data.to_stata(ppj("OUT_DATA", "final/{}_ready.dta".format(dataset_name)))
+    data.to_stata(ppj("OUT_DATA", "{}_ready.dta".format(dataset_name)))

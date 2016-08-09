@@ -3,7 +3,7 @@ channels:
 
 dependencies:
 
-- skillmodels=0.0.0023=py35_0
+- skillmodels=0.0.0052=py35_0
 - matplotlib=1.5.1
 - seaborn=0.7.0
 

@@ -14,10 +14,11 @@ if __name__ == '__main__':
         model_dict = json.load(j)
 
     # load the dataset from a dta file in bld.out.data
-    dataset = pd.read_stata(ppj('OUT_DATA', 'final/{}.dta'.format(dataset_name)))
+    dataset = pd.read_stata(ppj('OUT_DATA', '{}.dta'.format(dataset_name)))
 
     # create an instance of SkillModel
     mod = SkillModel(model_name, dataset_name, model_dict, dataset, 'chs')
+
     # call its fit method to estimate the model
     res = mod.fit()
 
@@ -28,10 +29,18 @@ if __name__ == '__main__':
     df['tvalues'] = res.tvalues
     df.reset_index(inplace=True)
 
-    # save the DataFrame
-    result_path = ppj('OUT_ANALYSIS', '{}_{}/results_df.csv').format(
+    # extract the results dictionary
+    res_dict = res.optimize_dict
+
+    # save the DataFrame and res_dict
+    df_path = ppj('OUT_ANALYSIS', '{}_{}/results_df.csv').format(
         model_name, dataset_name)
 
-    df.to_csv(result_path)
+    dict_path = ppj('OUT_ANALYSIS', '{}_{}/results_dict.json'.format(
+        model_name, dataset_name))
+
+    df.to_csv(df_path)
+    with open(dict_path, 'w') as j:
+        json.dump(res_dict, j)
 
 
