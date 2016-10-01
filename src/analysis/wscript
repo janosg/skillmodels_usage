@@ -3,10 +3,11 @@
 
 def build(ctx):
 
-    model_list = ['test_model2']
-    dataset_list = ['chs_test_ex2_ready']
+    models = ['no_squares_translog_model', 'test_model2']
+    datasets = ['ns_translog_data', 'chs_test_ex2_ready']
+    estimators = ['wa', 'chs']
 
-    for model, dataset in zip(model_list, dataset_list):
+    for model, dataset, estimator in zip(models, datasets, estimators):
         ctx(features='run_py_script',
             source='fit_models.py',
             deps=[
@@ -15,16 +16,18 @@ def build(ctx):
             target=ctx.path_to(
                 ctx, 'OUT_ANALYSIS', '{}_{}/results_df.csv'.format(
                     model, dataset)),
-            append=[model, dataset]),
+            append=[model, dataset, estimator]),
 
-        ctx(features='run_py_script',
-            source='visualize_fortran_and_python_parameters.py',
-            deps=[ctx.path_to(ctx, 'OUT_ANALYSIS', '{}_{}/results_df.csv'.format(
-                    model, dataset)),
-                  ctx.path_to(ctx, 'LIBRARY', 'true_{}_results.csv'.format(model))
-            ],
-            target=ctx.path_to(
-                ctx, 'OUT_ANALYSIS', '{}_{}/comparison_plot.png'.format(
-                    model, dataset)),
-            append=[model, dataset])
-
+        if model == 'test_model2':
+            ctx(features='run_py_script',
+                source='visualize_fortran_and_python_parameters.py',
+                deps=[
+                    ctx.path_to(
+                        ctx, 'OUT_ANALYSIS',
+                        '{}_{}/results_df.csv'.format(model, dataset)),
+                    ctx.path_to(
+                        ctx, 'LIBRARY', 'true_{}_results.csv'.format(model))],
+                target=ctx.path_to(
+                    ctx, 'OUT_ANALYSIS', '{}_{}/comparison_plot.png'.format(
+                        model, dataset)),
+                append=[model, dataset])

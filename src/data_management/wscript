@@ -13,3 +13,10 @@ def build(ctx):
                 ctx, 'OUT_DATA', '{}_ready.dta'.format(dataset)),
             append=dataset
         )
+
+    # fake data for ns_translog_model
+    ctx(
+        features='run_py_script',
+        source='generate_fake_data.py',
+        target=ctx.path_to(
+            ctx, 'OUT_DATA', 'ns_translog_data.dta'))
