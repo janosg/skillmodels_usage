@@ -6,6 +6,8 @@ dependencies:
 - skillmodels=0.0.0277=py35_0
 - matplotlib=1.5.1
 - seaborn=0.7.0
+- pandas=0.19
+
 
 
 
