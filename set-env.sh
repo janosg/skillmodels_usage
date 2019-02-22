@@ -4,7 +4,7 @@
 env_name=${PWD##*/}
 
 # try to activate environment
-source activate $env_name > /dev/null 2>&1
+conda activate $env_name > /dev/null 2>&1
 # get return code of activation
 OUT=$?
 # Add R channel
@@ -34,7 +34,7 @@ fi
 OUT=$?
 
 if [[ ! ($OUT -eq 1) ]]; then
-    source activate $env_name
+    conda activate $env_name
     # set alias for waf
     alias waf="python waf.py"
 

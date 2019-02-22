@@ -22,7 +22,7 @@ class sas(Task.Task):
 
 		# set the cwd
 		task.cwd = task.inputs[0].parent.get_src().abspath()
-		Logs.debug('runner: %s on %s' % (command, node.abspath))
+		Logs.debug('runner: %r on %r', command, node)
 
 		SASINPUTS = node.parent.get_bld().abspath() + os.pathsep + node.parent.get_src().abspath() + os.pathsep
 		task.env.env = {'SASINPUTS': SASINPUTS}
@@ -32,10 +32,10 @@ class sas(Task.Task):
 		task.env.LSTFILE = lstfilenode.abspath()
 		ret = fun(task)
 		if ret:
-			Logs.error('Running %s on %r returned a non-zero exit' % (command, node))
-			Logs.error('SRCFILE = %r' % node)
-			Logs.error('LOGFILE = %r' % logfilenode)
-			Logs.error('LSTFILE = %r' % lstfilenode)
+			Logs.error('Running %s on %r returned a non-zero exit', command, node)
+			Logs.error('SRCFILE = %r', node)
+			Logs.error('LOGFILE = %r', logfilenode)
+			Logs.error('LSTFILE = %r', lstfilenode)
 		return ret
 
 @feature('sas')
@@ -53,9 +53,12 @@ def apply_sas(self):
 		deps = self.to_list(self.deps)
 		for filename in deps:
 			n = self.path.find_resource(filename)
-			if not n: n = self.bld.root.find_resource(filename)
-			if not n: raise Errors.WafError('cannot find input file %s for processing' % filename)
-			if not n in deps_lst: deps_lst.append(n)
+			if not n:
+				n = self.bld.root.find_resource(filename)
+			if not n:
+				raise Errors.WafError('cannot find input file %s for processing' % filename)
+			if not n in deps_lst:
+				deps_lst.append(n)
 
 	for node in self.to_nodes(self.source):
 		if self.type == 'sas':

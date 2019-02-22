@@ -90,8 +90,8 @@ def apply_pch(self):
 
 	if getattr(self, 'name', None):
 		try:
-			task = self.bld.pch_tasks[self.name]
-			self.bld.fatal("Duplicated 'pch' task with name %r" % self.name)
+			task = self.bld.pch_tasks["%s.%s" % (self.name, self.idx)]
+			self.bld.fatal("Duplicated 'pch' task with name %r" % "%s.%s" % (self.name, self.idx))
 		except KeyError:
 			pass
 
@@ -104,7 +104,7 @@ def apply_pch(self):
 
 	self.pch_task = task
 	if getattr(self, 'name', None):
-		self.bld.pch_tasks[self.name] = task
+		self.bld.pch_tasks["%s.%s" % (self.name, self.idx)] = task
 
 @TaskGen.feature('cxx')
 @TaskGen.after_method('process_source', 'propagate_uselib_vars')
@@ -129,7 +129,7 @@ def add_pch(self):
 			x.env.append_value('CXXFLAGS', self.env['CXXPCH_F'] + [pch.target])
 
 class gchx(Task.Task):
-	run_str = '${CXX} ${ARCH_ST:ARCH} ${CXXFLAGS} ${CPPFLAGS} ${CXXPCH_FLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${CPPPATH_ST:INCPATHS} ${DEFINES_ST:DEFINES} ${CXXPCH_F:SRC} ${CXX_SRC_F}${SRC[0].abspath()} ${CXX_TGT_F}${TGT[0].abspath()}'
+	run_str = '${CXX} ${ARCH_ST:ARCH} ${CXXFLAGS} ${CXXPCH_FLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${CPPPATH_ST:INCPATHS} ${DEFINES_ST:DEFINES} ${CXXPCH_F:SRC} ${CXX_SRC_F}${SRC[0].abspath()} ${CXX_TGT_F}${TGT[0].abspath()} ${CPPFLAGS}'
 	scan    = c_preproc.scan
 	color   = 'BLUE'
 	ext_out=['.h']

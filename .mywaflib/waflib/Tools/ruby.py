@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 # daniel.svensson at purplescout.se 2008
-# Thomas Nagy 2010 (ita)
+# Thomas Nagy 2016-2018 (ita)
 
 """
 Support for Ruby extensions. A C/C++ compiler is required::
@@ -23,12 +23,12 @@ Support for Ruby extensions. A C/C++ compiler is required::
 """
 
 import os
-from waflib import Options, Utils, Task
+from waflib import Errors, Options, Task, Utils
 from waflib.TaskGen import before_method, feature, extension
 from waflib.Configure import conf
 
 @feature('rubyext')
-@before_method('apply_incpaths', 'apply_lib_vars', 'apply_bundle', 'apply_link')
+@before_method('apply_incpaths', 'process_source', 'apply_bundle', 'apply_link')
 def init_rubyext(self):
 	"""
 	Add required variables for ruby extensions
@@ -41,12 +41,12 @@ def init_rubyext(self):
 		self.uselib.append('RUBYEXT')
 
 @feature('rubyext')
-@before_method('apply_link', 'propagate_uselib')
+@before_method('apply_link', 'propagate_uselib_vars')
 def apply_ruby_so_name(self):
 	"""
 	Strip the *lib* prefix from ruby extensions
 	"""
-	self.env['cshlib_PATTERN'] = self.env['cxxshlib_PATTERN'] = self.env['rubyext_PATTERN']
+	self.env.cshlib_PATTERN = self.env.cxxshlib_PATTERN = self.env.rubyext_PATTERN
 
 @conf
 def check_ruby_version(self, minver=()):
@@ -56,33 +56,26 @@ def check_ruby_version(self, minver=()):
 	The ruby binary can be overridden by ``--with-ruby-binary`` command-line option.
 	"""
 
-	if Options.options.rubybinary:
-		self.env.RUBY = Options.options.rubybinary
-	else:
-		self.find_program('ruby', var='RUBY')
-
-	ruby = self.env.RUBY
+	ruby = self.find_program('ruby', var='RUBY', value=Options.options.rubybinary)
 
 	try:
 		version = self.cmd_and_log(ruby + ['-e', 'puts defined?(VERSION) ? VERSION : RUBY_VERSION']).strip()
-	except Exception:
+	except Errors.WafError:
 		self.fatal('could not determine ruby version')
 	self.env.RUBY_VERSION = version
 
 	try:
-		ver = tuple(map(int, version.split(".")))
-	except Exception:
+		ver = tuple(map(int, version.split('.')))
+	except Errors.WafError:
 		self.fatal('unsupported ruby version %r' % version)
 
 	cver = ''
 	if minver:
+		cver = '> ' + '.'.join(str(x) for x in minver)
 		if ver < minver:
 			self.fatal('ruby is too old %r' % ver)
-		cver = '.'.join([str(x) for x in minver])
-	else:
-		cver = ver
 
-	self.msg('Checking for ruby version %s' % str(minver or ''), cver)
+	self.msg('Checking for ruby version %s' % cver, version)
 
 @conf
 def check_ruby_ext_devel(self):
@@ -158,7 +151,7 @@ def check_ruby_module(self, module_name):
 	self.start_msg('Ruby module %s' % module_name)
 	try:
 		self.cmd_and_log(self.env.RUBY + ['-e', 'require \'%s\';puts 1' % module_name])
-	except Exception:
+	except Errors.WafError:
 		self.end_msg(False)
 		self.fatal('Could not find the ruby module %r' % module_name)
 	self.end_msg(True)
@@ -178,7 +171,7 @@ class run_ruby(Task.Task):
 			ctx.check_ruby_version()
 
 		def build(bld):
-			bld.env['RBFLAGS'] = '-e puts "hello world"'
+			bld.env.RBFLAGS = '-e puts "hello world"'
 			bld(source='a_ruby_file.rb')
 	"""
 	run_str = '${RUBY} ${RBFLAGS} -I ${SRC[0].parent.abspath()} ${SRC}'

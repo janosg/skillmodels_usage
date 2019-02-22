@@ -107,7 +107,7 @@ def retrieve(self, name, fromenv=None):
 		self.all_envs[name] = env
 	else:
 		if fromenv:
-			Logs.warn("The environment %s may have been configured already" % name)
+			Logs.warn('The environment %s may have been configured already', name)
 	return env
 Configure.ConfigurationContext.retrieve = retrieve
 
@@ -122,7 +122,7 @@ Options.OptionsContext.tool_options = Context.Context.load
 Options.Handler = Options.OptionsContext
 
 Task.simple_task_type = Task.task_type_from_func = Task.task_factory
-Task.TaskBase.classes = Task.classes
+Task.Task.classes = Task.classes
 
 def setitem(self, key, value):
 	if key.startswith('CCFLAGS'):
@@ -171,15 +171,15 @@ def load_module(path, encoding=None):
 	ret = rev(path, encoding)
 	if 'set_options' in ret.__dict__:
 		if Logs.verbose:
-			Logs.warn('compat: rename "set_options" to "options" (%r)' % path)
+			Logs.warn('compat: rename "set_options" to "options" (%r)', path)
 		ret.options = ret.set_options
 	if 'srcdir' in ret.__dict__:
 		if Logs.verbose:
-			Logs.warn('compat: rename "srcdir" to "top" (%r)' % path)
+			Logs.warn('compat: rename "srcdir" to "top" (%r)', path)
 		ret.top = ret.srcdir
 	if 'blddir' in ret.__dict__:
 		if Logs.verbose:
-			Logs.warn('compat: rename "blddir" to "out" (%r)' % path)
+			Logs.warn('compat: rename "blddir" to "out" (%r)', path)
 		ret.out = ret.blddir
 	Utils.g_module = Context.g_module
 	Options.launch_dir = Context.launch_dir
@@ -229,8 +229,8 @@ def apply_uselib_local(self):
 	self.includes = self.to_list(getattr(self, 'includes', []))
 	names = self.to_list(getattr(self, 'uselib_local', []))
 	get = self.bld.get_tgen_by_name
-	seen = set([])
-	seen_uselib = set([])
+	seen = set()
+	seen_uselib = set()
 	tmp = Utils.deque(names) # consume a copy of the list of names
 	if tmp:
 		if Logs.verbose:
@@ -316,10 +316,12 @@ def apply_objdeps(self):
 			lst = y.to_list(y.add_objects)
 			lst.reverse()
 			for u in lst:
-				if u in seen: continue
+				if u in seen:
+					continue
 				added = 1
 				names = [u]+names
-			if added: continue # list of names modified, loop
+			if added:
+				continue # list of names modified, loop
 
 		# safe to process the current object
 		y.post()
@@ -341,8 +343,10 @@ def add_obj_file(self, file):
 	"""Small example on how to link object files as if they were source
 	obj = bld.create_obj('cc')
 	obj.add_obj_file('foo.o')"""
-	if not hasattr(self, 'obj_files'): self.obj_files = []
-	if not 'process_obj_files' in self.meths: self.meths.append('process_obj_files')
+	if not hasattr(self, 'obj_files'):
+		self.obj_files = []
+	if not 'process_obj_files' in self.meths:
+		self.meths.append('process_obj_files')
 	self.obj_files.append(file)
 
 
@@ -375,10 +379,10 @@ def install_dir(self, path):
 	destpath = Utils.subst_vars(path, self.env)
 
 	if self.is_install > 0:
-		Logs.info('* creating %s' % destpath)
+		Logs.info('* creating %s', destpath)
 		Utils.check_dir(destpath)
 	elif self.is_install < 0:
-		Logs.info('* removing %s' % destpath)
+		Logs.info('* removing %s', destpath)
 		try:
 			os.remove(destpath)
 		except OSError:
