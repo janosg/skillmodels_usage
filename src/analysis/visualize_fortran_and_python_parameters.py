@@ -34,7 +34,7 @@ def plot_results_comparison(df, colnames, path, title):
 
     for i, col in enumerate(colnames):
         axes[col] = ax.barh(
-            bottom=i + np.array(range(0, y_max, (nr_cols + 1))),
+            y=i + np.array(range(0, y_max, (nr_cols + 1))),
             width=df[col],
             height=0.9,
             color=colors[i],
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     true_df = pd.read_csv(true_path.format(model), index_col="index")
     estimated_path = ppj("OUT_ANALYSIS", "{}_{}/results_df.csv")
     estimated_df = pd.read_csv(estimated_path.format(model, dataset), index_col="index")
-    df = pd.concat([estimated_df, true_df], axis=1)
+    df = pd.concat([estimated_df, true_df], axis=1, sort=False)
 
     df["Fortran"] = df["chs_params"] - df["true_value"]
     df["Python"] = df["params"] - df["true_value"]
